@@ -25,6 +25,14 @@ def main() -> None:
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8", newline="") as f:
         f.write(line)
+    # Post-write read-back gate: verify what actually landed on disk
+    # matches the expected line, byte for byte, inside the 1-120 gate.
+    with open(OUTPUT_PATH, "r", encoding="utf-8", newline="") as f:
+        written = f.read()
+    if written != line:
+        raise SystemExit("read-back mismatch: output differs from expected line")
+    if not 1 <= len(written) <= MAX_CHARS:
+        raise SystemExit(f"read-back length {len(written)} outside the 1-{MAX_CHARS} gate")
 
 
 if __name__ == "__main__":
